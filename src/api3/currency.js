@@ -1,17 +1,21 @@
-import { convert } from "./currency";
-import { server, rest } from "../../testServer";
+import axios from "axios"
 
-it("converts correctly", async () => {
-  const rate = await convert("USD", "CAD");
-  expect(rate).toEqual(1.42);
-});
+// async function convertFetch(base, destination) {
+//     const result = await fetch(
+//         `https://api.exchangeratesapi.io/latest?base=${base}`
+//     )
+//     if (!result.ok) {
+//         throw new Error(`Request failed with status code ${result.status}`)
+//     }
+//     const data = await result.json()
+//     return data.rates[destination]
+// }
 
-it("handles failure", async () => {
-  server.use(
-    rest.get("https://api.exchangeratesapi.io/latest", (_req, res, ctx) => {
-      return res(ctx.status(404));
-    })
-  );
+async function convertAxios(base, destination) {
+    const result = await axios.get(
+        `https://api.exchangeratesapi.io/latest?base=${base}`
+    )
+    return result.data.rates[destination]
+}
 
-  await expect(convert("FAIL", "CAD")).rejects.toThrow("404");
-});
+export { convertAxios as convert }
